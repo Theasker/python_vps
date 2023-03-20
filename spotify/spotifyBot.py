@@ -62,7 +62,6 @@ class Spotify(TelegramBot):
             print(offset, "/", response['total'])
             return response['items']
 
-
     def _download(self, url):
         carpetaServidor = '/home/ubuntu/docker/python/data/src/spotify/canciones'
         spotdlcommand = f'docker run --rm -v {carpetaServidor}:/music spotdl download {url}'
