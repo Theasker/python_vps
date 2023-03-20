@@ -127,3 +127,17 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+**/.env
+ngrok
+messages.log
+
+# Añadidos
+__pycache__
+*.txt
+*.mp4
+*.mp3
+tmp
+*.jpg
+./videos
+config*
+pruebas*
