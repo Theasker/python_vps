@@ -10,3 +10,4 @@ config*
 pruebas*
 .cache
 temp*
+*.log

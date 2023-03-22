@@ -7,15 +7,14 @@ from telegramBot.telegramBot import TelegramBot
 import subprocess
 
 class Spotify(TelegramBot):
-    def __init__(self):
+    def __init__(self, url):
         self._inifile = '/usr/src/app/spotify/config.json'
         self._inivars = {} # Creo un diccionario para las variables del fichero
         self._get_inivars()
         # Carga el token del bot en la clase heredada
-        super().__init__(self._inivars['TELEGRAMBOTTOKEN'])
-        # print(self._inivars)
+        # super().__init__(self._inivars['TELEGRAMBOTTOKEN'])
         self.sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=self._inivars['CLIENTID'], client_secret=self._inivars['CLIENTSECRET']))
-        # print(self._inivars)
+        self._dispatch(url)
 
     def _get_inivars(self):
         try:
@@ -24,6 +23,10 @@ class Spotify(TelegramBot):
         except OSError:
             print("Could not open/read file:", fname)
             sys.exit()
+
+    def _dispatch(self, url):
+        if ('playlist' in 'url'):
+            print('playlist')
 
     # Obtiene las playlist del usuario
     def get_userPlaylists(self, username):
@@ -74,7 +77,12 @@ class Spotify(TelegramBot):
         else:
             print("Se produjo un error al ejecutar el comando")
 
-sp = Spotify()
-# print(json.dumps(sp.get_userPlaylists("theasker")))
-traks = sp.get_playlistTracks('0lE83xKqGubpiWolhvckBx')
-sp.send_message( json.dumps(traks) )
+if __name__ == "__main__":
+    # https://open.spotify.com/playlist/37i9dQZF1E37e4h5zszmNm?si=1add55e9d58d4d99
+    # https://open.spotify.com/track/0sFHYyAlJL0KffCEobuftY?si=f10c9fdff90640d5
+    # https://open.spotify.com/playlist/37i9dQZEVXcTz8Pp3f26IJ?si=a709282848b04717
+
+    sp = Spotify()
+    # print(json.dumps(sp.get_userPlaylists("theasker")))
+    traks = sp.get_playlistTracks('0lE83xKqGubpiWolhvckBx')
+    # sp.send_message( json.dumps(traks) )

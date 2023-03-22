@@ -28,14 +28,6 @@ class TelegramBot():
         # print(self._params)
         # self.dispatch()
 
-    def set_webhook(url):
-        set_webhook_url = self._url + f"setWebhook?url={url}"
-        response = requests.get(set_webhook_url)
-        if response.status_code == 200:
-            return "Webhook has been set successfully."
-        else:
-            return f"Error setting webhook: {response.content.decode('utf-8')}"
-
     def get_properties(self, botToken):
         properties = []
         try:
@@ -46,6 +38,19 @@ class TelegramBot():
         except OSError:
             print("Could not open/read file:", fname)
             sys.exit()
+
+    def set_webhook(self, url):
+        set_webhook_url = self._url + f"setWebhook?url={url}"
+        response = requests.get(set_webhook_url)
+        if response.status_code == 200:
+            return "Webhook has been set successfully."
+        else:
+            return f"Error setting webhook: {response.content.decode('utf-8')}"
+
+    def get_WebhookInfo(self, botToken):
+        url = f"{self._url}getWebhookInfo"
+        response = requests.get(url)
+        return response.content
 
     def get_me(self):
         method = "getme"
@@ -73,7 +78,6 @@ class TelegramBot():
             'disable_web_page_preview': True
             }
         response = requests.post(self._url + method, data=data)
-        print(self._url);
         return json.loads(response.text)
 
     def send_media(self, filename, type, caption="", chat_id = '-797062014' ):

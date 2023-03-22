@@ -1,16 +1,51 @@
+import configparser
+import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-from telegramBot.telegramBot import TelegramBot
-from youtube.youtubeAPI import YoutubeAPI
 from datetime import datetime
 import http.client
+from telegramBot.telegramBot import TelegramBot
+from youtube.youtubeAPI import YoutubeAPI
+from utils.utils import Utils
+
+# Carga de las variables de configuración
+config = configparser.ConfigParser() 
+config.read('/usr/src/app/config.ini')
+bot_token = config['TELEGRAM']['BOT_TOKEN']
+url_base = config['TELEGRAM']['URL_BASE']
+logging.basicConfig(
+    filename='main.log', 
+    encoding='utf-8', 
+    level=logging.DEBUG,
+    format='%(asctime)s:  %(name)s: %(levelname)s: %(message)s', 
+    datefmt='%Y/%m/%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
+logger.info(option)
+
+bot = TelegramBot(bot_token)
 
 app = FastAPI()
+
+def pipedream(text):
+    conn = http.client.HTTPSConnection('eolmlyay4to9iia.m.pipedream.net')
+    conn.request("POST", "/", f'{"test": "{text}"}', {'Content-Type': 'application/json'})
+
+@app.post("/telegram")
+async def telegram_webhook(request: Request):
+    update = await request.json()
+    chat_id = update["message"]["chat"]["id"]
+    message_text = update["message"]["text"]
+    pipedream(message_text)
+    utils = Utils(message_text)
+    utils.pruebas()
+    return {"ok": True}
+
 """ 
 @app.get("/")
 def root():
     return {"message": datetime.now()}
- """
+"""
 @app.get("/", response_class=HTMLResponse)
 async def read_items():
     html_content = """
@@ -43,21 +78,5 @@ async def youtube():
     # return yt._get_videos_from_channel("atareao")
     return {"user_id": "the current user"}
 
-"""
-# Telegram webhook
-from fastapi import FastAPI, Request
-import telegram
-
-app = FastAPI()
-bot_token = "YOUR_BOT_TOKEN"
-bot = telegram.Bot(token=bot_token)
-
-@app.post("/telegram_webhook")
-async def telegram_webhook(request: Request):
-    update = telegram.Update.de_json(await request.json(), bot)
-    chat_id = update.message.chat.id
-    message_text = update.message.text
-    bot.send_message(chat_id=chat_id, text=f"Received message: {message_text}")
-
-    return {"ok": True}
-"""
+# if __name__ == "__main__":
+    

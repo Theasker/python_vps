@@ -42,12 +42,15 @@ class YoutubeAPI():
 
         return channels
     
-    # Devuelve los videos del día de un canal
-    def _get_videos_from_channel(self, channel_id):
+    # Devuelve los videos del día de un canal desde una fecha dada
+    def _get_videos_from_channel(self, channel_id, after_date):
+
         API_KEY = self._youtubeapikey
         CHANNEL_NAME = channel_id
-        FECHA_INICIO = datetime.datetime(2023, 3, 15).replace(hour=0, minute=0, second=0, microsecond=0).isoformat() + 'Z'
+        # FECHA_INICIO = datetime.datetime(2023, 3, 15).replace(hour=0, minute=0, second=0, microsecond=0).isoformat() + 'Z'
+        FECHA_INICIO = datetime.datetime(after_date.year, after_date.month, after_date.day).replace(hour=0, minute=0, second=0, microsecond=0).isoformat() + 'Z'
         #FECHA_FIN = datetime.datetime(2023, 3, 31).replace(hour=23, minute=59, second=59, microsecond=999999).isoformat() + 'Z'
+        print(FECHA_INICIO)
         MAX_RESULTS = 10
         
         """
@@ -85,17 +88,13 @@ class YoutubeAPI():
                     'fecha': resultado['snippet']['publishedAt'],
                 }
                 videos.append(video)
+        print(f"channel_id: {channel_id} ({len(videos)} vídeos)")
         return videos
 
     def _save_json(self, text):
         file = open('temp.json','w+')
         file.write(text)
         file.close()
-    
-    def download_from_channels(self):
-        channels = self._get_channels()
-        for ch in channels:
-            print(f"{ch} => ")
     
     def pruebas(self):
         # Define la URL del canal de YouTube
@@ -137,20 +136,52 @@ class YoutubeAPI():
         # Realiza la solicitud de búsqueda a la API de YouTube
         response = requests.get("https://www.googleapis.com/youtube/v3/search", params=params)
         
+        res = json.loads(response.content)      
 
-        
-        # Analiza la respuesta de la API de YouTube
-        data = json.loads(response.text)        
-        channel_id = data["items"][0]["id"]["channelId"]
+        if (len(res['items']) == 0):
+            print("No hay resultados")
+            return None
+        else:
+            # Analiza la respuesta de la API de YouTube
+            data = json.loads(response.text)        
+            channel_id = data["items"][0]["id"]["channelId"]
 
-        # Imprime el ID del canal
-        return channel_id
-        
+            # Imprime el ID del canal
+            return channel_id
+
+    def _get_last_date(self):
+        # Leer la fecha del archivo de texto
+        with open('date.txt', 'r') as filedate:
+            last_date = filedate.read()
+        # Convertir la cadena de texto en un objeto datetime
+        # last_date_obj = datetime.datetime.strptime(last_date, '%Y-%m-%d %H:%M:%S.%f')
+        last_date_obj = datetime.datetime.strptime(last_date, '%Y-%m-%d')
+        # print(f"{last_date} ({type(last_date)}) => {last_date_obj} ({type(last_date_obj)})")
+        # Obtener la fecha actual
+        now_date = datetime.datetime.now()
+        # Escribir la fecha en un archivo de texto
+        with open('date.txt', 'w') as filedate:
+            date_str = now_date.strftime('%Y-%m-%d')
+            filedate.write(date_str)
+        # Devolvemos la fecha del fichero como objeto fecha
+        return last_date_obj
+
+    def download_from_channels(self):
+        channels = self._get_channels()
+        # Get the last date saved
+        after_date = self._get_last_date()
+        for ch in channels:
+            print(f"Channel: {ch}")
+            # Get the channel id
+            channel_id = self._get_channelID_from_channelURL(ch)
+            # print(f"{ch} => {channel_id}")
+            videos = self._get_videos_from_channel(channel_id, after_date)
+            # print(videos)        
 
 if __name__ == "__main__":
     yt = YoutubeAPI()
-    # yt.download_from_channels()
-    print(yt._get_channelID_from_channelURL("https://www.youtube.com/@MauriSegura"))
+    yt.download_from_channels()
+    # print(yt._get_channelID_from_channelURL("https://www.youtube.com/@MauriSegura"))
 
     
 
