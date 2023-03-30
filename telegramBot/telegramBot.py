@@ -47,6 +47,11 @@ class TelegramBot():
         else:
             return f"Error setting webhook: {response.content.decode('utf-8')}"
 
+    def delete_webhook(self, botToken):
+        url = self._url + "deleteWebhook"
+        response = requests.get(url)
+        return response.text
+
     def get_WebhookInfo(self, botToken):
         url = f"{self._url}getWebhookInfo"
         response = requests.get(url)
@@ -269,17 +274,4 @@ class TelegramBot():
         print("\t--getupdates\t\t\tGet updates telegram method")
 
 if __name__ == "__main__":
-    telegram_bot = TelegramBot("5941895196:AAGBMQx-cTqgBXA4dzsyyZw_IViT8PWk3Dg")
-    telegram_bot.send_message("hola que tal")
-    # print(telegram_bot.get_updates())
-    # Imprimo la última actualización
-    # print(json.dumps(telegram_bot.get_updates()['result'][-1], indent=2))
-    # print(telegram_bot.get_updates())
-    #print(json.dumps(telegram_bot.get_updates(), indent=2))
-    # now = datetime.now()
-    # date_time = now.strftime("%Y/%m/%d, %H:%M:%S")
-    # channelId: -1001519446927
-    # groupId: -797062014
-    # print(telegram_bot.send_message(date_time + " <b>Hola canal</b>","-1001519446927"))
-    #print(telegram_bot.send_message(date_time + " <a href=\"https://laflordearagon.es\">laflordearagon</a>","-797062014"))
-    #print(json.dumps(telegram_bot.get_updates_chat("-1001519446927"), indent=2))
+    print (__name__)

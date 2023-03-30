@@ -2,10 +2,23 @@ import logging
 import subprocess
 import json
 import traceback
-import http.client
+import configparser
+import sys
+# append the path of the parent directory
+sys.path.append("..")
+from telegramBot.telegramBot import TelegramBot
 
 class Utils():
     def __init__(self, option):
+        # Carga de las variables de configuración
+        config = configparser.ConfigParser() 
+        config.read('/usr/src/app/utils/config.ini')
+        self.bot_token = config['UTILS']['BOT_TOKEN']
+        self.url_base = config['UTILS']['URL_BASE']
+        self.log_file = config['UTILS']['LOG_FILE']
+        # Configuración del logger
+
+        logger = logging.getLogger(__name__)
         logging.basicConfig(
             filename='utils.log', 
             encoding='utf-8', 
@@ -15,8 +28,7 @@ class Utils():
         )
         self.logger = logging.getLogger(__name__)
         self.logger.info(option)
-        temp = "opcion: " + option
-        self.pipedream(temp)
+        self.truncate_file(self.log_file)
         if (option.startswith("/")):
             self._dispatcher(option)
     
@@ -28,11 +40,20 @@ class Utils():
         if (option == '/wol'):
             self.wol()
     
+    def truncate_file(self,file):
+        try:
+            with open(file, "r+") as f:
+                f.truncate(0)
+        except FileNotFoundError:
+            print('El archivo no existe')
+        except:
+            print('Ocurrió un error')
+
     def wol(self):
         try:
-             # ssh pi@casa.theasker.ovh etherwake -i eth0 00:23:7D:07:64:DD
-            cmd = ['ssh', 'root@casa.theasker.ovh', 'ls', '-la', '/mnt/datos']
-            cmd = ['adsfds']
+            # ssh pi@casa.theasker.ovh etherwake -i eth0 00:23:7D:07:64:DD
+            # cmd = ['ssh', 'root@casa.theasker.ovh', 'ls', '-la', '/mnt/datos']
+            cmd = ['ssh', 'root@casa.theasker.ovh', 'etherwake', '-i', 'eth0', '00:23:7D:07:64:DD']
             resultado = subprocess.run(cmd, capture_output=True)
             # resultado = subprocess.run(['ssh', 'root@casa.theasker.ovh', '-i', 'eth0', '00:23:7D:07:64:DD'])
             out = resultado.stdout.decode('utf-8')
@@ -41,13 +62,12 @@ class Utils():
                 self.logger.info(f"CMD: {resultado.args}")
             else:
                 self.logger.error(f"CMD: {resultado.args}")
+            print(out)
             return out
         except FileNotFoundError as e:
             self.logger.error(f"CMD: {cmd} {traceback.format_exc()}")
-
-    def pruebas(self):
-        self.logger.info("prueba")
+            print("Comando no existe")
 
 if __name__ == "__main__":
-    utils = Utils("wol")
-    utils.pruebas()
+    utils = Utils("/wol")
+    
