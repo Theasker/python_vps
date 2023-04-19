@@ -26,7 +26,7 @@ class TelegramBot():
         self._url = None
         self.get_properties(botToken)
         # print(self._params)
-        # self.dispatch()
+        self.dispatch()
 
     def get_properties(self, botToken):
         properties = []

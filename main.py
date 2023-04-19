@@ -43,9 +43,13 @@ async def telegram_webhook(request: Request):
     truncate_file(log_file)
     bot = TelegramBot(bot_token)
     data = await request.json()
-    if (data["message"]):
-        # Sacamos la información que necesito
+    print(data)
+    # Comprobamos si es un mensaje o una edición de mensaje
+    if 'edited_message' in data:
+        message = data["edited_message"]
+    elif 'message' in data:
         message = data["message"]
+        # Sacamos la información que necesito
         chat_id = message["chat"]["id"]
         text = message["text"]
         name = message["from"]["first_name"]

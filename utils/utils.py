@@ -7,6 +7,7 @@ import sys
 # append the path of the parent directory
 sys.path.append("..")
 from telegramBot.telegramBot import TelegramBot
+from text2audio.text2audio import save_text_to_audio_file, gtts
 
 class Utils():
     def __init__(self, option):
@@ -22,7 +23,7 @@ class Utils():
         logging.basicConfig(
             filename='utils.log', 
             encoding='utf-8', 
-            level=logging.DEBUG,
+            level=logging.ERROR,
             format='%(asctime)s:  %(name)s: %(levelname)s: %(message)s', 
             datefmt='%Y/%m/%d %H:%M:%S'
         )
@@ -39,6 +40,10 @@ class Utils():
     def _dispatcher(self, option):
         if (option == '/wol'):
             self.wol()
+        elif (option.startswith("/text2audio ")):
+            gtts(option.replace("/text2audio ", ""))
+        elif (option.startswith("/text2audio2 ")):
+            save_text_to_audio_file(option.replace("/text2audio2 ", ""))
     
     def truncate_file(self,file):
         try:
@@ -69,5 +74,9 @@ class Utils():
             print("Comando no existe")
 
 if __name__ == "__main__":
-    utils = Utils("/wol")
+    print(f"Ejecutando el fichero {__name__}")
+    texto = """
+    Yo para ser felíz quiero un camión
+    """
+    utils = Utils(f"/text2audio {texto}")
     

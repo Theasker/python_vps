@@ -3,6 +3,7 @@ import json
 import datetime
 import os
 import configparser
+import logging
 import subprocess
 import re
 
@@ -14,6 +15,18 @@ class YoutubeAPI():
         self._channelsFile = '/usr/src/app/youtube/channels.txt'
         self._urlapi = 'https://www.googleapis.com/youtube/v3'
         self._youtubeapikey = self._config['YOUTUBE']['APIKEY']
+        self.LOGFILE = self._config['YOUTUBE']['LOGFILE']
+        # Configuro el loggin 
+        logger = logging.getLogger(__name__)
+        logging.basicConfig(
+            filename=self.LOGFILE, 
+            encoding='utf-8', 
+            level=logging.INFO,
+            format='%(asctime)s:  %(name)s: %(levelname)s: %(message)s', 
+            datefmt='%Y/%m/%d %H:%M:%S'
+        )
+        self.logger = logging.getLogger(__name__)
+        self.truncate_file(self.LOGFILE)
         """
         self._inifile = "config.json"
         self._inivars = {} # Creo un diccionario para las variables del fichero
@@ -35,11 +48,9 @@ class YoutubeAPI():
     def _get_channels(self):
         # Leo los canales del fichero de texto
         channels = []
-
         with open(self._channelsFile, 'r') as file:
             for line in file:
                 channels.append(line.strip())
-
         return channels
     
     # Devuelve los videos del día de un canal desde una fecha dada
@@ -168,6 +179,7 @@ class YoutubeAPI():
 
     def download_from_channels(self):
         channels = self._get_channels()
+        self.logger.info(channels)
         # Get the last date saved
         after_date = self._get_last_date()
         for ch in channels:
@@ -178,9 +190,18 @@ class YoutubeAPI():
             videos = self._get_videos_from_channel(channel_id, after_date)
             # print(videos)        
 
+    def truncate_file(self, file):
+        try:
+            with open(file, "r+") as f:
+                f.truncate(0)
+        except FileNotFoundError:
+            print('El archivo no existe')
+        except:
+            print('Ocurrió un error')
+
 if __name__ == "__main__":
     yt = YoutubeAPI()
-    yt.download_from_channels()
+    # yt.download_from_channels()
     # print(yt._get_channelID_from_channelURL("https://www.youtube.com/@MauriSegura"))
 
     
