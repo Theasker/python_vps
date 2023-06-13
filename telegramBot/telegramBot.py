@@ -34,7 +34,8 @@ class TelegramBot():
             with open(PROPERTIES, 'r') as file:
                 self._params = json.load(file)
                 self._params['token'] = botToken
-                self._url = f"{self._params['url_local']}{self._params['token']}/"
+                self._url = f"{self._params['url']}{self._params['token']}/"
+                # self._url = f"{self._params['url_local']}{self._params['token']}/"
         except OSError:
             print("Could not open/read file:", fname)
             sys.exit()
@@ -140,9 +141,8 @@ class TelegramBot():
                 count = count + 1
 
     def dispatch(self):
-        print (sys.argv)
-        print (len(sys.argv))
         # check number arguments
+        # print(sys.argv)
         if len(sys.argv) > 1 & len(sys.argv) <= 5: 
             if sys.argv[1] == "-m":
                 if 2 >= len(sys.argv):
@@ -255,8 +255,6 @@ class TelegramBot():
             elif sys.argv[1] == "--getupdates":
                 response = self.get_updates()
                 print(json.dumps(response, indent=2))
-            else:
-                self.help()
         # El número de parámetros no es el correcto
         else:
             print("El número de parámetros no es el correcto: " , len(sys.argv))

@@ -1,4 +1,5 @@
 import logging
+import qrcode
 import subprocess
 import json
 import traceback
@@ -10,26 +11,27 @@ from telegramBot.telegramBot import TelegramBot
 from text2audio.text2audio import save_text_to_audio_file, gtts
 
 class Utils():
-    def __init__(self, option):
+    def __init__(self, option, chat_id):
         # Carga de las variables de configuración
         config = configparser.ConfigParser() 
         config.read('/usr/src/app/utils/config.ini')
         self.bot_token = config['UTILS']['BOT_TOKEN']
         self.url_base = config['UTILS']['URL_BASE']
         self.log_file = config['UTILS']['LOG_FILE']
+        self.chat_id = chat_id
         # Configuración del logger
 
         logger = logging.getLogger(__name__)
         logging.basicConfig(
             filename='utils.log', 
             encoding='utf-8', 
-            level=logging.ERROR,
-            format='%(asctime)s:  %(name)s: %(levelname)s: %(message)s', 
+            level=logging.INFO,
+            format='%(asctime)s: %(levelname)s: %(name)s: %(message)s', 
             datefmt='%Y/%m/%d %H:%M:%S'
         )
         self.logger = logging.getLogger(__name__)
         self.logger.info(option)
-        self.truncate_file(self.log_file)
+        # self.truncate_file(self.log_file)
         if (option.startswith("/")):
             self._dispatcher(option)
     
@@ -40,6 +42,8 @@ class Utils():
     def _dispatcher(self, option):
         if (option == '/wol'):
             self.wol()
+        elif (option.startswith("/qr ")):
+            self.QRcode(option.replace("/qr ", ""))
         elif (option.startswith("/text2audio ")):
             gtts(option.replace("/text2audio ", ""))
         elif (option.startswith("/text2audio2 ")):
@@ -54,6 +58,29 @@ class Utils():
         except:
             print('Ocurrió un error')
 
+    def QRcode(self, text):
+        # Crear el objeto QRCode
+        codigo_qr = qrcode.QRCode(
+            version=1,  # Tamaño del código QR (1-40)
+            error_correction=qrcode.constants.ERROR_CORRECT_L,  # Nivel de corrección de errores
+            box_size=10,  # Tamaño de cada caja (píxel)
+            border=2,  # Tamaño del borde (módulo)
+        )
+
+        # Agregar los datos al código QR
+        codigo_qr.add_data(text)
+        codigo_qr.make(fit=True)
+
+        # Crear una imagen PIL (Python Imaging Library) a partir del código QR
+        imagen_qr = codigo_qr.make_image(fill_color="black", back_color="white")
+
+        # Guardar la imagen QR en un archivo
+        nombre_archivo = "codigo_qr.png"
+        imagen_qr.save(nombre_archivo)
+        bot = TelegramBot(self.bot_token)
+        print(bot.send_media(nombre_archivo, "photo", self.chat_id))
+        print(f"Generado el código QR del texto: {text}")
+        self.logger.info(f"QRcode: {text}")
     def wol(self):
         try:
             # ssh pi@casa.theasker.ovh etherwake -i eth0 00:23:7D:07:64:DD
@@ -78,5 +105,5 @@ if __name__ == "__main__":
     texto = """
     Yo para ser felíz quiero un camión
     """
-    utils = Utils(f"/text2audio {texto}")
-    
+    # utils = Utils(f"/text2audio {texto}")
+    utils = Utils(f"/qr {texto}")

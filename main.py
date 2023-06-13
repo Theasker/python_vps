@@ -23,6 +23,8 @@ logging.basicConfig(
     format='%(asctime)s:  %(name)s: %(levelname)s: %(message)s', 
     datefmt='%Y/%m/%d %H:%M:%S'
 )
+
+
 logger = logging.getLogger(__name__)
 
 #print(f"Ejecutando línea: {inspect.currentframe().f_lineno}")
@@ -40,10 +42,10 @@ app = FastAPI()
 
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
-    truncate_file(log_file)
-    bot = TelegramBot(bot_token)
+    # truncate_file(log_file)
+    # bot = TelegramBot(bot_token)
     data = await request.json()
-    print(data)
+    print(json.dumps(data, indent=2))
     # Comprobamos si es un mensaje o una edición de mensaje
     if 'edited_message' in data:
         message = data["edited_message"]
@@ -54,10 +56,11 @@ async def telegram_webhook(request: Request):
         text = message["text"]
         name = message["from"]["first_name"]
         username = message["from"]["username"]
-        logger.info(f"chat_id: {chat_id} / mensaje: {text} / name: {name} / username: {username}")
+        logger.info(f"chat_id: {chat_id} / name: {name} / mensaje: {text} / username: {username}")
         logger.info(json.dumps(data, indent=2))
         if (text.startswith("/")):
-            utils = Utils(text)
+            print("text" + text)
+            utils = Utils(text, chat_id)
     return {"ok": True}
 
 @app.get("/", response_class=HTMLResponse)
