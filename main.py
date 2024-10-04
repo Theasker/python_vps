@@ -45,6 +45,7 @@ async def telegram_webhook(request: Request):
     # truncate_file(log_file)
     # bot = TelegramBot(bot_token)
     data = await request.json()
+    print("============= LLEGAN DATOS =============")
     print(json.dumps(data, indent=2))
     # Comprobamos si es un mensaje o una edición de mensaje
     if 'edited_message' in data:
@@ -52,12 +53,19 @@ async def telegram_webhook(request: Request):
     elif 'message' in data:
         message = data["message"]
         # Sacamos la información que necesito
-        chat_id = message["chat"]["id"]
-        text = message["text"]
-        name = message["from"]["first_name"]
-        username = message["from"]["username"]
-        logger.info(f"chat_id: {chat_id} / name: {name} / mensaje: {text} / username: {username}")
-        logger.info(json.dumps(data, indent=2))
+        if 'chat' in message:
+            chat_id = message["chat"]["id"]        
+        if ('text'in message):
+            text = message["text"]
+        if ('name'in message['from']):
+            name = message["from"]["first_name"]
+        else:
+            name = "."
+        if ('first_name'in message['from']):
+            first_name = message["from"]["first_name"]
+        if (text):
+            logger.info(f"chat_id: {chat_id} / name: {name} / mensaje: {text} / first_name: {first_name}")
+        #logger.info(json.dumps(data, indent=2))
         if (text.startswith("/")):
             print("text" + text)
             utils = Utils(text, chat_id)

@@ -18,6 +18,7 @@ class Utils():
         self.bot_token = config['UTILS']['BOT_TOKEN']
         self.url_base = config['UTILS']['URL_BASE']
         self.log_file = config['UTILS']['LOG_FILE']
+        print(f"option: {option}, chat_id: {chat_id}")
         self.chat_id = chat_id
         # Configuración del logger
 
@@ -78,14 +79,16 @@ class Utils():
         nombre_archivo = "codigo_qr.png"
         imagen_qr.save(nombre_archivo)
         bot = TelegramBot(self.bot_token)
-        print(bot.send_media(nombre_archivo, "photo", self.chat_id))
+        # parámetros método "send_media": (filename, type, caption="", chat_id ):
+        print(bot.send_media(nombre_archivo, "photo", f"\"{text}\"", self.chat_id))
         print(f"Generado el código QR del texto: {text}")
         self.logger.info(f"QRcode: {text}")
+    
     def wol(self):
         try:
             # ssh pi@casa.theasker.ovh etherwake -i eth0 00:23:7D:07:64:DD
             # cmd = ['ssh', 'root@casa.theasker.ovh', 'ls', '-la', '/mnt/datos']
-            cmd = ['ssh', 'root@casa.theasker.ovh', 'etherwake', '-i', 'eth0', '00:23:7D:07:64:DD']
+            cmd = ['ssh', 'root@casa.theasker.ovh','sudo', 'etherwake', '-i', 'eth0', '00:23:7D:07:64:DD']
             resultado = subprocess.run(cmd, capture_output=True)
             # resultado = subprocess.run(['ssh', 'root@casa.theasker.ovh', '-i', 'eth0', '00:23:7D:07:64:DD'])
             out = resultado.stdout.decode('utf-8')
@@ -94,7 +97,7 @@ class Utils():
                 self.logger.info(f"CMD: {resultado.args}")
             else:
                 self.logger.error(f"CMD: {resultado.args}")
-            print(out)
+            print("out:",out)
             return out
         except FileNotFoundError as e:
             self.logger.error(f"CMD: {cmd} {traceback.format_exc()}")
@@ -106,4 +109,4 @@ if __name__ == "__main__":
     Yo para ser felíz quiero un camión
     """
     # utils = Utils(f"/text2audio {texto}")
-    utils = Utils(f"/qr {texto}")
+    utils = Utils(f"/qr {texto}", '-797062014')

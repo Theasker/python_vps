@@ -28,6 +28,7 @@ class TelegramBot():
         # print(self._params)
         self.dispatch()
 
+    # Carga el fichero de configuración
     def get_properties(self, botToken):
         properties = []
         try:
@@ -36,6 +37,7 @@ class TelegramBot():
                 self._params['token'] = botToken
                 self._url = f"{self._params['url']}{self._params['token']}/"
                 # self._url = f"{self._params['url_local']}{self._params['token']}/"
+                # print(f"Parámetros => {self._params}")
         except OSError:
             print("Could not open/read file:", fname)
             sys.exit()
@@ -257,7 +259,7 @@ class TelegramBot():
                 print(json.dumps(response, indent=2))
         # El número de parámetros no es el correcto
         else:
-            print("El número de parámetros no es el correcto: " , len(sys.argv))
+            print(f"El número de parámetros no es el correcto: {len(sys.argv)} => {sys.argv}")
             self.help()
     
     def help(self):
@@ -273,3 +275,9 @@ class TelegramBot():
 
 if __name__ == "__main__":
     print (__name__)
+    btoken = '6181016891:AAFY_fpL6DoWm4pZ3LVxosq9wCAEzILFA0Y'
+    chatid_familia = '-1001507585258'
+    chatid_pruebas = '-797062014'
+    tele = TelegramBot(btoken)
+    tele.send_media("./tmp/ines.jpg", "photo", "foto para Inés", chatid_familia)
+    
