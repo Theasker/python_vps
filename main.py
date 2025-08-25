@@ -73,14 +73,14 @@ async def telegram_webhook(request: Request):
 
 @app.get("/", response_class=HTMLResponse)
 async def read_items():
-
-    html_content = """
+    h = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    html_content = f"""
     <html>
         <head>
             <title>Python Telegram Bot</title>
         </head>
         <body>
-            <h1>Python Telegram Bot</h1>
+            <h1>Python Telegram Bot: {h}</h1>
         </body>
     </html>
     """
